@@ -8,6 +8,11 @@
     <artifactId>smlevaluation</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>net.dean.jraw</groupId>
@@ -17,7 +22,12 @@
         <dependency>
             <groupId>com.github.frjonsen</groupId>
             <artifactId>SocialMediaLibrary</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>master-a81fba0ef2-1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.cfg4j</groupId>
+            <artifactId>cfg4j-core</artifactId>
+            <version>4.4.0</version>
         </dependency>
     </dependencies>
 
