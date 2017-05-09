@@ -25,16 +25,6 @@ import java.util.List;
 public class SocialMediaPublisher {
     List<SocialMediaAPI<? extends User, ? extends Post>> apis = new ArrayList<>();
 
-    private static ConfigurationProvider getConfig() {
-        ConfigFilesProvider filesProvider = () -> Arrays.asList(new File("secrets.yaml").toPath().toAbsolutePath());
-        ConfigurationSource fileConfig = new FilesConfigurationSource(filesProvider);
-        ConfigurationSource source = new EnvironmentVariablesConfigurationSource();
-        FallbackConfigurationSource fallbackConfig = new FallbackConfigurationSource(fileConfig, source);
-        return new ConfigurationProviderBuilder()
-                .withConfigurationSource(fallbackConfig)
-                .build();
-    }
-
     private static FacebookAPI getFacebookAPI(ConfigurationProvider config) {
         String appId = config.getProperty("FACEBOOK.APPID", String.class);
         String appSecret = config.getProperty("FACEBOOK.APPSECRET", String.class);
@@ -61,7 +51,7 @@ public class SocialMediaPublisher {
     }
 
     public SocialMediaPublisher() {
-        ConfigurationProvider config = getConfig();
+        ConfigurationProvider config = Configuration.getInstance().getConfig();
         apis.add(getFacebookAPI(config));
         apis.add(getTumblrAPI(config));
         apis.add(getTwitterAPI(config));
