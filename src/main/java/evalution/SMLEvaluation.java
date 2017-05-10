@@ -14,7 +14,7 @@ public class SMLEvaluation {
             String message = miner.getRandomHotSubmission();
             System.out.println("Printing new message: " + message);
             publisher.publish(message);
-            sleep(120000L);
+            sleep(1200000L);
         }
     }
 }
