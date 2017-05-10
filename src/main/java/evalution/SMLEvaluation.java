@@ -15,6 +15,7 @@ public class SMLEvaluation {
             System.out.println("Printing new message: " + message);
             publisher.publish(message);
             sleep(1200000L);
+            miner.refreshToken();
         }
     }
 }

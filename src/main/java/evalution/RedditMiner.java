@@ -1,6 +1,7 @@
 package evalution;
 
 import net.dean.jraw.RedditClient;
+import net.dean.jraw.auth.RefreshTokenHandler;
 import net.dean.jraw.http.UserAgent;
 import net.dean.jraw.http.oauth.Credentials;
 import net.dean.jraw.http.oauth.OAuthData;
@@ -24,6 +25,11 @@ public class RedditMiner {
     private RedditClient client;
     private Random randomGenerator;
     private List<String> previousPosts;
+    private OAuthData oAuthData;
+
+    public void refreshToken(){
+        client.authenticate(oAuthData);
+    }
 
     public RedditMiner() throws OAuthException {
         ConfigurationProvider config = Configuration.getInstance().getConfig();
@@ -36,8 +42,8 @@ public class RedditMiner {
         UserAgent userAgent = UserAgent.of("desktop", appId, "v0.1", "SocialMediaLibrary");
 
         client = new RedditClient(userAgent);
-        OAuthData data = client.getOAuthHelper().easyAuth(credentials);
-        client.authenticate(data);
+        oAuthData = client.getOAuthHelper().easyAuth(credentials);
+        this.refreshToken();
 
         randomGenerator = new Random();
         previousPosts = new ArrayList<>();
@@ -54,10 +60,12 @@ public class RedditMiner {
         Listing<Submission> currentPage = pager.get(index).next();
 
 
-        Submission submission = currentPage.stream()
+        List<Submission> submissionList = currentPage.stream()
                 .filter(item -> !(item.isStickied() || previousPosts.contains(item.getId())))
-                .findFirst()
-                .get();
+                .limit(20L)
+                .collect(Collectors.toList());
+        index = randomGenerator.nextInt(submissionList.size());
+        Submission submission = submissionList.get(index);
         this.previousPosts.add(submission.getId());
 
         List<String> postList = new ArrayList<>();
