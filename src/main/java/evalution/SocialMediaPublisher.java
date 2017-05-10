@@ -60,7 +60,11 @@ public class SocialMediaPublisher {
 
     public void publish(String body) {
         for (SocialMediaAPI api : apis) {
-            api.publishStatusPost(body);
+            try {
+                api.publishStatusPost(body);
+            } catch(Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 }
