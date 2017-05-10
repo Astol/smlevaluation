@@ -29,7 +29,8 @@ public class SocialMediaPublisher {
         String appId = config.getProperty("FACEBOOK.APPID", String.class);
         String appSecret = config.getProperty("FACEBOOK.APPSECRET", String.class);
         String token = config.getProperty("FACEBOOK.ACCESSTOKEN", String.class);
-        return new FacebookAPIImpl(appId, appSecret, token, "public_profile,user_about_me,user_hometown,email");
+        FacebookAPI api = new FacebookAPIImpl(appId, appSecret, token, "public_profile,user_about_me,user_hometown,email");
+        return new FacebookAPIImpl(appId, appSecret, api.getPages().get(0).getAccessToken(), "public_profile,user_about_me,user_hometown,email");
     }
 
     private static TwitterAPI getTwitterAPI(ConfigurationProvider config) {

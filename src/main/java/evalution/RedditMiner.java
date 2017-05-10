@@ -5,7 +5,16 @@ import net.dean.jraw.http.UserAgent;
 import net.dean.jraw.http.oauth.Credentials;
 import net.dean.jraw.http.oauth.OAuthData;
 import net.dean.jraw.http.oauth.OAuthException;
+import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.Submission;
+import net.dean.jraw.paginators.SubredditPaginator;
 import org.cfg4j.provider.ConfigurationProvider;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class RedditMiner {
     public RedditClient getClient() {
@@ -13,6 +22,8 @@ public class RedditMiner {
     }
 
     private RedditClient client;
+    private Random randomGenerator;
+    private List<String> previousPosts;
 
     public RedditMiner() throws OAuthException {
         ConfigurationProvider config = Configuration.getInstance().getConfig();
@@ -27,7 +38,46 @@ public class RedditMiner {
         client = new RedditClient(userAgent);
         OAuthData data = client.getOAuthHelper().easyAuth(credentials);
         client.authenticate(data);
+
+        randomGenerator = new Random();
+        previousPosts = new ArrayList<>();
     }
 
+    public String getRandomHotSubmission() {
+        List<SubredditPaginator> pager = Arrays.asList(
+                new SubredditPaginator(client,"funny"),
+                new SubredditPaginator(client,"iamverysmart"),
+                new SubredditPaginator(client,"jokes"),
+                new SubredditPaginator(client,"programmerhumor"));
+
+        int index = randomGenerator.nextInt(pager.size());
+        Listing<Submission> currentPage = pager.get(index).next();
+
+
+        Submission submission = currentPage.stream()
+                .filter(item -> !(item.isStickied() || previousPosts.contains(item.getId())))
+                .findFirst()
+                .get();
+        this.previousPosts.add(submission.getId());
+
+        List<String> postList = new ArrayList<>();
+        postList.add(submission.getTitle());
+        postList.add(submission.getSelftext());
+        postList.add(submission.getUrl());
+
+        if(!submission.getUrl().endsWith(submission.getPermalink())) {
+            postList.add(submission.getPermalink());
+        }
+
+        List<String> resultList = postList.stream()
+                .filter(item -> !isNullOrWhitespace(item))
+                .collect(Collectors.toList());
+
+        return String.join("\n\n", resultList);
+    }
+
+    private static boolean isNullOrWhitespace(String str) {
+        return str == null || str.trim().isEmpty();
+    }
 
 }
